@@ -12,6 +12,10 @@
     "test": "turbo run test",
     "typecheck": "turbo run typecheck"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.53.3",
+    "@swc/core-linux-x64-gnu": "^1.15.3"
+  },
   "devDependencies": {
     "turbo": "^2.0.0"
   }
