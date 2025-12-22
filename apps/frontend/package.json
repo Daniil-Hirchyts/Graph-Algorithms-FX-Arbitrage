@@ -42,10 +42,6 @@
     "zod": "^4.1.13",
     "zustand": "^5.0.9"
   },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.53.3",
-    "@swc/core-linux-x64-gnu": "1.15.3"
-  },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/cytoscape": "^3.31.0",

@@ -20,7 +20,7 @@ In the FX view, each node is a currency, each directed edge is an exchange rate,
 - In-browser snapshots via Dexie (no server-side persistence)
 - FastAPI REST API for graph algorithms
 - React/Vite UI for visualization and execution
-- Turborepo workspace + Docker for easy deployment
+- Turborepo workspace for easy deployment
 
 ## Tech Stack
 
@@ -28,7 +28,6 @@ In the FX view, each node is a currency, each directed edge is an exchange rate,
 - Frontend: React, Vite, TypeScript, Tailwind
 - Local storage: Dexie (IndexedDB)
 - Monorepo: Turborepo
-- Containers: Docker + Docker Compose
 
 ## Project Layout
 
@@ -37,7 +36,6 @@ In the FX view, each node is a currency, each directed edge is an exchange rate,
 ├── apps/
 │   ├── backend/              # FastAPI service
 │   └── frontend/             # React/Vite UI
-├── docker-compose.yml
 ├── package.json              # Turbo workspace root
 ├── turbo.json
 └── README.md
@@ -166,22 +164,6 @@ curl -X POST http://localhost:8000/generate \
 - The backend keeps a small in-memory cache only during the server session.
 - No snapshot files are written on the server.
 - If the backend restarts, `snapshot_id` references are no longer valid.
-
-## Docker
-
-Build and run the full stack from the repo root:
-
-```bash
-docker compose up --build
-```
-
-- Frontend: http://localhost:5173
-- Backend: http://localhost:8000
-
-Stop containers:
-```bash
-docker compose down
-```
 
 ## Testing
 
