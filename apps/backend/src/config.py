@@ -19,43 +19,13 @@ class Config:
 
     def __init__(self):
         """Load configuration from YAML and environment variables."""
-        # Load YAML config with fallback to defaults
+        # Load YAML config
         config_path = PROJECT_ROOT / "config" / "default.yaml"
-
-        try:
-            with open(config_path, "r") as f:
-                self._config: Dict[str, Any] = yaml.safe_load(f)
-        except (FileNotFoundError, IOError) as e:
-            # Fallback to hardcoded defaults for serverless environments
-            print(f"Warning: Could not load config file, using defaults: {e}")
-            self._config = self._get_default_config()
+        with open(config_path, "r") as f:
+            self._config: Dict[str, Any] = yaml.safe_load(f)
 
         # Override with environment variables where applicable
         self._apply_env_overrides()
-
-    def _get_default_config(self) -> Dict[str, Any]:
-        """Return default configuration when YAML file is not available."""
-        return {
-            "nodes": {
-                "default_list": ["USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD", "NZD", "SEK", "NOK"],
-                "anchor_node": "USD"
-            },
-            "cost_model": {
-                "base_cost": 10,
-                "extra_cost": 5
-            },
-            "generated_data": {
-                "default_num_nodes": 7,
-                "default_value_min": 0.1,
-                "default_value_max": 10.0,
-                "default_variance": "medium",
-                "available_nodes": [
-                    "USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD", "NZD", "SEK", "NOK",
-                    "SGD", "HKD", "MXN", "BRL", "INR", "CNY", "KRW", "ZAR", "PLN", "CZK",
-                    "TRY", "AED", "SAR", "THB", "MYR", "IDR", "PHP"
-                ]
-            }
-        }
 
     def _apply_env_overrides(self):
         """Apply environment variable overrides."""
