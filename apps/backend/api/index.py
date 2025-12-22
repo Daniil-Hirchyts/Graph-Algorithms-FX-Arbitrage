@@ -11,14 +11,9 @@ sys.path.insert(0, str(backend_root))
 # Set working directory to backend root for file operations
 os.chdir(str(backend_root))
 
-try:
-    from mangum import Mangum
-    from src.main import app as fastapi_app
+from mangum import Mangum
+from src.main import app
 
-    # Wrap FastAPI app with Mangum for serverless compatibility
-    handler = Mangum(fastapi_app, lifespan="off")
-except Exception as e:
-    print(f"Error initializing app: {e}")
-    import traceback
-    traceback.print_exc()
-    raise
+# Wrap FastAPI app with Mangum for serverless compatibility
+# This is the handler that Vercel will invoke
+handler = Mangum(app, lifespan="off")
