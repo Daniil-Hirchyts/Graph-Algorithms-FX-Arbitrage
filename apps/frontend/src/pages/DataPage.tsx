@@ -1,24 +1,22 @@
 import { useState } from 'react';
 import { SnapshotsTable } from '@/components/data/SnapshotsTable';
-import { GraphMetadata } from '@/components/data/GraphMetadata';
 import { DatasetBuilder } from '@/components/data/DatasetBuilder';
 import { useAppStore } from '@/stores/useAppStore';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { generateSnapshot } from '@/lib/api/mutations';
 import { db } from '@/lib/db';
 import { deleteSnapshot, getSnapshot, saveSnapshot } from '@/lib/snapshots';
-import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import type { GenerationRequest } from '@/lib/schemas';
 
 export function DataPage() {
   const apiBaseUrl = useAppStore((s) => s.apiBaseUrl);
   const selectedSnapshotId = useAppStore((s) => s.selectedSnapshotId);
+  const loadedGraph = useAppStore((s) => s.loadedGraph);
+  const loadedGraphSnapshotId = useAppStore((s) => s.loadedGraphSnapshotId);
   const setLoadedGraph = useAppStore((s) => s.setLoadedGraph);
   const setSelectedSnapshotId = useAppStore((s) => s.setSelectedSnapshotId);
   const snapshots = useLiveQuery(
@@ -110,47 +108,33 @@ export function DataPage() {
         </Alert>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[1.15fr_0.95fr]">
-        <div className="space-y-4">
-          <GraphMetadata />
-        </div>
-
-        <Card className="border-2 border-black rounded-none shadow-none" data-tour="data-content">
-          <CardHeader className="border-b-2 border-black pb-4">
-            <CardTitle>Actions</CardTitle>
-            <CardDescription>Create FX datasets and load graphs.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 pt-4">
-            <div className="grid grid-cols-2 gap-2">
-              <DatasetBuilder onCreate={handleCreate} isLoading={creating} />
-
-              <Button
-                onClick={() => handleLoadGraph('latest')}
-                disabled={loadingGraph || snapshots.length === 0}
-                variant="outline"
-                size="sm"
-                className="w-full border-2 border-black rounded-none shadow-none font-mono uppercase text-[11px]"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                {loadingGraph ? 'Loading...' : 'Load Latest'}
-              </Button>
-              
+      <Card className="border-2 border-black rounded-none shadow-none" data-tour="data-content">
+        <CardHeader className="border-b-2 border-black pb-3">
+          <div className="flex items-start justify-between">
+            <div>
+              <CardTitle className="text-base">Current Graph</CardTitle>
+              <CardDescription className="text-xs mt-1">
+                {loadedGraph ? `${loadedGraph.metadata.node_count} currencies · ${loadedGraph.metadata.edge_count} edges` : 'No graph loaded'}
+              </CardDescription>
             </div>
-
-            <Separator />
-
-            <div className="text-xs text-muted-foreground leading-relaxed">
-              <p className="font-semibold text-foreground">Selected Snapshot</p>
-              <p>{selectedSnapshotId ? selectedSnapshotId : 'No snapshot selected yet.'}</p>
-              <p className="mt-2">
-                Tip: Create a snapshot to test FX paths with controlled data.
-              </p>
+            <DatasetBuilder onCreate={handleCreate} isLoading={creating} />
+          </div>
+        </CardHeader>
+        <CardContent className="pt-3">
+          {loadedGraph ? (
+            <div className="space-y-1.5 text-xs">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Snapshot ID:</span>
+                <span className="font-mono">{loadedGraphSnapshotId}</span>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Create a snapshot to get started.</p>
+          )}
+        </CardContent>
+      </Card>
 
-      <div className="space-y-2">
+      <div className="space-y-2 pb-4">
         <div>
           <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
             Snapshot history

@@ -95,15 +95,14 @@ export function MstForm() {
         <Button
           onClick={() => onSubmit('prim')}
           disabled={loading}
-          className="flex-1 border-2 border-black rounded-none shadow-none font-mono uppercase text-xs"
+          className="flex-1 border-2 border-black rounded-none shadow-none font-mono uppercase text-xs bg-black text-white hover:bg-black/80"
         >
           {loading ? 'Running...' : 'Run Prim'}
         </Button>
         <Button
           onClick={() => onSubmit('kruskal')}
           disabled={loading}
-          variant="secondary"
-          className="flex-1 border-2 border-black rounded-none shadow-none font-mono uppercase text-xs"
+          className="flex-1 border-2 border-black rounded-none shadow-none font-mono uppercase text-xs bg-black text-white hover:bg-black/80"
         >
           {loading ? 'Running...' : 'Run Kruskal'}
         </Button>

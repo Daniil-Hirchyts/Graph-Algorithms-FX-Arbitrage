@@ -6,41 +6,6 @@ from src.generation.scenarios import get_scenario, get_available_scenarios
 
 
 class TestGraphDataGenerator:
-    def test_generate_random_values(self):
-        generator = GraphDataGenerator(seed=42)
-        nodes = ["USD", "EUR", "GBP", "JPY"]
-
-        dataset = generator.generate_random_values(
-            anchor_node="USD",
-            nodes=nodes,
-            value_min=0.5,
-            value_max=2.0,
-            variance="medium",
-        )
-
-        assert dataset.dataset_type == "random"
-        assert dataset.anchor_node == "USD"
-        assert len(dataset.node_values) == len(nodes)
-        assert dataset.node_values["USD"] == 1.0
-
-        for node, value in dataset.node_values.items():
-            if node != "USD":
-                assert value > 0
-                assert 0.5 * 0.7 <= value <= 2.0 * 1.4
-
-    def test_generate_random_values_reproducible(self):
-        generator = GraphDataGenerator(seed=42)
-        nodes = ["USD", "EUR", "GBP"]
-
-        dataset = generator.generate_random_values("USD", nodes)
-
-        assert dataset.node_values["USD"] == 1.0
-        assert len(dataset.node_values) == 3
-        assert all(value > 0 for value in dataset.node_values.values())
-
-        for node in ["EUR", "GBP"]:
-            assert 0.1 <= dataset.node_values[node] <= 20.0
-
     def test_generate_from_scenario(self):
         generator = GraphDataGenerator()
         values, info = get_scenario("hub_and_spoke")
@@ -74,18 +39,19 @@ class TestGraphDataGenerator:
 
         assert dataset.dataset_type == "custom"
         assert dataset.node_values == custom_values
-
-    def test_variance_levels(self):
-        generator = GraphDataGenerator(seed=42)
+    def test_generate_custom_values_adds_anchor(self):
+        generator = GraphDataGenerator()
+        custom_values = {"EUR": 0.85, "GBP": 0.73}
         nodes = ["USD", "EUR", "GBP"]
 
-        low = generator.generate_random_values("USD", nodes, variance="low")
-        medium = generator.generate_random_values("USD", nodes, variance="medium")
-        high = generator.generate_random_values("USD", nodes, variance="high")
+        dataset = generator.generate_custom_values(
+            custom_values=custom_values,
+            anchor_node="USD",
+            nodes=nodes,
+        )
 
-        for dataset in [low, medium, high]:
-            assert dataset.node_values["USD"] == 1.0
-            assert all(value > 0 for value in dataset.node_values.values())
+        assert dataset.dataset_type == "custom"
+        assert dataset.node_values["USD"] == 1.0
 
 
 class TestScenarios:
@@ -140,6 +106,12 @@ class TestScenarios:
 
     def test_all_scenarios_have_valid_values(self):
         scenarios = [
+            "bfs_traversal",
+            "dfs_traversal",
+            "dijkstra_paths",
+            "bellman_ford_arbitrage",
+            "floyd_warshall_matrix",
+            "mst_network",
             "negative_cycle",
             "sparse_graph",
             "dense_graph",

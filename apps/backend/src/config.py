@@ -57,21 +57,5 @@ class Config:
     def available_nodes(self) -> List[str]:
         return self._config["generated_data"]["available_nodes"]
 
-    @property
-    def default_num_nodes(self) -> int:
-        return int(self._config["generated_data"]["default_num_nodes"])
-
-    @property
-    def default_value_min(self) -> float:
-        return float(self._config["generated_data"]["default_value_min"])
-
-    @property
-    def default_value_max(self) -> float:
-        return float(self._config["generated_data"]["default_value_max"])
-
-    @property
-    def default_variance(self) -> str:
-        return str(self._config["generated_data"]["default_variance"])
-
 # Global config instance
 config = Config()

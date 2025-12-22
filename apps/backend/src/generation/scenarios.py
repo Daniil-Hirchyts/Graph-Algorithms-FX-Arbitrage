@@ -49,6 +49,8 @@ BASE_VALUES: Dict[str, float] = {
     "PHP": 1.18,
 }
 
+DEFAULT_SCENARIO_ID = "dense_graph"
+
 
 def values_for(nodes: List[str]) -> Dict[str, float]:
     return {node: BASE_VALUES[node] for node in nodes}
@@ -271,8 +273,86 @@ def scenario_linear_chain() -> Tuple[Dict[str, float], ScenarioInfo]:
     return values_for(nodes), info
 
 
+def scenario_bfs_traversal() -> Tuple[Dict[str, float], ScenarioInfo]:
+    values, base = scenario_balanced_tree()
+    info = ScenarioInfo(
+        name="bfs_traversal",
+        display_name="BFS Traversal",
+        description="Layered tree structure to highlight breadth-first levels.",
+        nodes=base.nodes,
+        pairs=base.pairs,
+    )
+    return values, info
+
+
+def scenario_dfs_traversal() -> Tuple[Dict[str, float], ScenarioInfo]:
+    values, base = scenario_linear_chain()
+    info = ScenarioInfo(
+        name="dfs_traversal",
+        display_name="DFS Traversal",
+        description="Deep chain for depth-first exploration.",
+        nodes=base.nodes,
+        pairs=base.pairs,
+    )
+    return values, info
+
+
+def scenario_dijkstra_paths() -> Tuple[Dict[str, float], ScenarioInfo]:
+    values, base = scenario_sparse_graph()
+    info = ScenarioInfo(
+        name="dijkstra_paths",
+        display_name="Dijkstra Paths",
+        description="Sparse paths for shortest-route exploration.",
+        nodes=base.nodes,
+        pairs=base.pairs,
+    )
+    return values, info
+
+
+def scenario_bellman_ford_arbitrage() -> Tuple[Dict[str, float], ScenarioInfo]:
+    values, base = scenario_negative_cycle()
+    info = ScenarioInfo(
+        name="bellman_ford_arbitrage",
+        display_name="Bellman-Ford Arbitrage",
+        description="Cycle-heavy graph for negative-cycle detection.",
+        nodes=base.nodes,
+        pairs=base.pairs,
+    )
+    return values, info
+
+
+def scenario_floyd_warshall_matrix() -> Tuple[Dict[str, float], ScenarioInfo]:
+    values, base = scenario_dense_graph()
+    info = ScenarioInfo(
+        name="floyd_warshall_matrix",
+        display_name="Floyd-Warshall Matrix",
+        description="Dense graph for all-pairs analysis.",
+        nodes=base.nodes,
+        pairs=base.pairs,
+    )
+    return values, info
+
+
+def scenario_mst_network() -> Tuple[Dict[str, float], ScenarioInfo]:
+    values, base = scenario_hub_and_spoke()
+    info = ScenarioInfo(
+        name="mst_network",
+        display_name="MST Network",
+        description="Hub structure for minimum spanning tree tests.",
+        nodes=base.nodes,
+        pairs=base.pairs,
+    )
+    return values, info
+
+
 def get_available_scenarios() -> List[ScenarioInfo]:
     scenarios = [
+        scenario_bfs_traversal,
+        scenario_dfs_traversal,
+        scenario_dijkstra_paths,
+        scenario_bellman_ford_arbitrage,
+        scenario_floyd_warshall_matrix,
+        scenario_mst_network,
         scenario_negative_cycle,
         scenario_sparse_graph,
         scenario_dense_graph,
@@ -287,6 +367,12 @@ def get_available_scenarios() -> List[ScenarioInfo]:
 
 def get_scenario(scenario_id: str) -> Tuple[Dict[str, float], ScenarioInfo]:
     scenarios = {
+        "bfs_traversal": scenario_bfs_traversal,
+        "dfs_traversal": scenario_dfs_traversal,
+        "dijkstra_paths": scenario_dijkstra_paths,
+        "bellman_ford_arbitrage": scenario_bellman_ford_arbitrage,
+        "floyd_warshall_matrix": scenario_floyd_warshall_matrix,
+        "mst_network": scenario_mst_network,
         "negative_cycle": scenario_negative_cycle,
         "sparse_graph": scenario_sparse_graph,
         "dense_graph": scenario_dense_graph,

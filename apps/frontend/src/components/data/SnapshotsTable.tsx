@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAppStore } from '@/stores/useAppStore';
-import { cn } from '@/lib/utils';
+import { cn, downloadJson } from '@/lib/utils';
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trash2 } from 'lucide-react';
+import { Download, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -54,7 +54,7 @@ export function SnapshotsTable({
     }
   };
 
-  if (loadingExternal) {
+  if (loadingExternal && snapshots.length === 0) {
     return (
       <Card className="rounded-none border-2 border-black shadow-none">
         <CardHeader className="border-b-2 border-black p-3">
@@ -85,7 +85,9 @@ export function SnapshotsTable({
         <CardHeader className="border-b-2 border-black p-3">
           <div className="flex justify-between items-center">
             <CardTitle className="text-xs font-mono uppercase tracking-wider">Snapshots History</CardTitle>
-            <span className="text-[10px] font-mono text-muted-foreground uppercase">{snapshots.length} RECORDS</span>
+            <span className="text-[10px] font-mono text-muted-foreground uppercase">
+              {snapshots.length} RECORDS
+            </span>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -97,7 +99,7 @@ export function SnapshotsTable({
                   <TableHead className="h-8 font-mono text-[10px] uppercase tracking-wider text-black font-bold">Scenario</TableHead>
                   <TableHead className="h-8 font-mono text-[10px] uppercase tracking-wider text-black font-bold text-right">Currencies</TableHead>
                   <TableHead className="h-8 font-mono text-[10px] uppercase tracking-wider text-black font-bold text-right">Edges</TableHead>
-                  <TableHead className="h-8 font-mono text-[10px] uppercase tracking-wider text-black font-bold text-center w-[50px]">Action</TableHead>
+                  <TableHead className="h-8 font-mono text-[10px] uppercase tracking-wider text-black font-bold text-center w-[90px]">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -125,20 +127,38 @@ export function SnapshotsTable({
                       <TableCell className="py-2 font-mono text-xs text-right">{snapshot.node_count}</TableCell>
                       <TableCell className="py-2 font-mono text-xs text-right">{snapshot.edge_count}</TableCell>
                       <TableCell className="py-2 text-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={cn(
-                            "h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground",
-                            isSelected && "text-white hover:text-white hover:bg-red-600"
-                          )}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteId(snapshot.id);
-                          }}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+                        <div className="flex items-center justify-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={cn(
+                              "h-6 w-6 p-0 border-2 border-black rounded-none",
+                              isSelected && "border-white text-white hover:text-white hover:bg-white/10"
+                            )}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              downloadJson(`${snapshot.id}.json`, snapshot);
+                            }}
+                            aria-label="Download snapshot JSON"
+                          >
+                            <Download className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={cn(
+                              "h-6 w-6 p-0 border-2 border-black rounded-none hover:bg-destructive hover:text-destructive-foreground",
+                              isSelected && "border-white text-white hover:text-white hover:bg-red-600"
+                            )}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteId(snapshot.id);
+                            }}
+                            aria-label="Delete snapshot"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );

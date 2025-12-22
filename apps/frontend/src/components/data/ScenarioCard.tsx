@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Network, GitBranch, Share2, Shuffle, Split, Grid, Link } from 'lucide-react';
+import { Network, GitBranch, Share2, Shuffle, Split, Grid, Link, Route } from 'lucide-react';
 
 interface ScenarioCardProps {
   name: string;
@@ -20,6 +20,12 @@ const scenarioIcons: Record<string, React.ElementType> = {
   'disconnected_components': Split,
   'balanced_tree': GitBranch,
   'linear_chain': Network,
+  'bfs_traversal': Network,
+  'dfs_traversal': GitBranch,
+  'dijkstra_paths': Route,
+  'bellman_ford_arbitrage': Shuffle,
+  'floyd_warshall_matrix': Grid,
+  'mst_network': Share2,
 };
 
 export function ScenarioCard({ 

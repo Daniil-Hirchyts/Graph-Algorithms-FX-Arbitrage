@@ -35,7 +35,7 @@ class TestGenerateEndpoint:
     def test_generate_success(self, mock_graph_builder, mock_generator):
         mock_gen_instance = mock_generator.return_value
         mock_dataset = GeneratedDataset(
-            dataset_type="random",
+            dataset_type="custom",
             scenario_id=None,
             generation_params={},
             node_values={"A": 1.0, "B": 0.92},
@@ -43,7 +43,7 @@ class TestGenerateEndpoint:
             nodes=["A", "B"],
             anchor_node="A",
         )
-        mock_gen_instance.generate_random_values.return_value = mock_dataset
+        mock_gen_instance.generate_custom_values.return_value = mock_dataset
 
         mock_gb_instance = mock_graph_builder.return_value
         mock_graph_payload = GraphPayload(
@@ -53,17 +53,29 @@ class TestGenerateEndpoint:
         )
         mock_gb_instance.build_graph.return_value = mock_graph_payload
 
-        response = client.post("/generate")
+        response = client.post(
+            "/generate",
+            json={
+                "mode": "custom",
+                "custom_values": {"A": 1.0, "B": 0.92},
+                "nodes": ["A", "B"],
+                "anchor_node": "A",
+            },
+        )
 
         assert response.status_code == 201
         data = response.json()
-        assert data["dataset_type"] == "random"
+        assert data["dataset_type"] == "custom"
         assert "graph_payload" in data
 
     def test_generate_invalid_node(self):
         response = client.post(
             "/generate",
-            json={"nodes": ["A", ""]},
+            json={
+                "mode": "custom",
+                "custom_values": {"A": 1.0, "B": 0.92},
+                "nodes": ["A", ""],
+            },
         )
 
         assert response.status_code == 400

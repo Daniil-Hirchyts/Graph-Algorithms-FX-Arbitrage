@@ -24,19 +24,10 @@ export const GraphPayloadSchema = z.object({
   metadata: GraphMetadataSchema,
 });
 
-export const GenerationParamsSchema = z.object({
-  num_nodes: z.number().min(3).max(50).optional(),
-  value_min: z.number().positive().optional(),
-  value_max: z.number().positive().optional(),
-  variance: z.enum(['low', 'medium', 'high']).optional(),
-  seed: z.number().int().optional(),
-});
-
 export const GenerationRequestSchema = z.object({
-  mode: z.enum(['random', 'scenario', 'custom']),
+  mode: z.enum(['scenario', 'custom']),
   scenario_id: z.string().optional(),
   custom_values: z.record(z.string(), z.number()).optional(),
-  generation_params: GenerationParamsSchema.optional(),
   anchor_node: z.string().optional(),
   nodes: z.array(z.string()).optional(),
   pairs: z.array(z.tuple([z.string(), z.string()])).optional(),
@@ -187,7 +178,6 @@ export type GraphMetadata = z.infer<typeof GraphMetadataSchema>;
 export type GraphPayload = z.infer<typeof GraphPayloadSchema>;
 export type HealthResponse = z.infer<typeof HealthResponseSchema>;
 export type GenerationResponse = z.infer<typeof GenerationResponseSchema>;
-export type GenerationParams = z.infer<typeof GenerationParamsSchema>;
 export type GenerationRequest = z.infer<typeof GenerationRequestSchema>;
 export type ScenarioInfo = z.infer<typeof ScenarioInfoSchema>;
 

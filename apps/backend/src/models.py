@@ -50,7 +50,7 @@ class GraphPayload(BaseModel):
 
 
 class GeneratedDataset(BaseModel):
-    dataset_type: Literal["random", "scenario", "custom"] = Field(
+    dataset_type: Literal["scenario", "custom"] = Field(
         ..., validation_alias=AliasChoices("dataset_type", "source_type")
     )
     scenario_id: Optional[str] = Field(
@@ -77,29 +77,14 @@ class GeneratedDataset(BaseModel):
         return v
 
 
-class GenerationParams(BaseModel):
-    num_nodes: Optional[int] = Field(
-        None, ge=3, le=50, validation_alias=AliasChoices("num_nodes", "num_currencies")
-    )
-    value_min: Optional[float] = Field(
-        None, gt=0, validation_alias=AliasChoices("value_min", "rate_min")
-    )
-    value_max: Optional[float] = Field(
-        None, gt=0, validation_alias=AliasChoices("value_max", "rate_max")
-    )
-    variance: Optional[Literal["low", "medium", "high"]] = None
-    seed: Optional[int] = None
-
-
 class GenerationRequest(BaseModel):
-    mode: Literal["random", "scenario", "custom"] = "random"
+    mode: Literal["scenario", "custom"] = "scenario"
     scenario_id: Optional[str] = Field(
         None, validation_alias=AliasChoices("scenario_id", "scenario_name")
     )
     custom_values: Optional[Dict[str, float]] = Field(
         None, validation_alias=AliasChoices("custom_values", "custom_rates")
     )
-    generation_params: Optional[GenerationParams] = None
 
     anchor_node: Optional[str] = Field(
         None, validation_alias=AliasChoices("anchor_node", "base_currency")

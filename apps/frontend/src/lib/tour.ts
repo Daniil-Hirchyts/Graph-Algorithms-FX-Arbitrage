@@ -115,8 +115,9 @@ export function createTour({ setPage }: TourOptions) {
       <div class="space-y-2">
         <p>Use the buttons here to generate test data.</p>
         <ul class="list-disc space-y-1 text-sm">
-          <li>Pick a scenario or generate random data</li>
-          <li>Click "Load Latest" to view it in the graph</li>
+          <li>Pick an algorithm preset or topology scenario</li>
+          <li>Select a snapshot from the history table to load it</li>
+          <li>Download snapshot JSON from the history table</li>
         </ul>
       </div>
     `,
@@ -194,6 +195,8 @@ export function createTour({ setPage }: TourOptions) {
       <div class="space-y-2">
         <p>Click on any algorithm in the right panel to expand it and run.</p>
         <p class="text-xs mt-2">Results will be highlighted on the graph.</p>
+        <p class="text-xs mt-2">Switching snapshots clears prior results and highlights.</p>
+        <p class="text-xs mt-2">Use the results panel to download JSON.</p>
       </div>
     `,
     buttons: [

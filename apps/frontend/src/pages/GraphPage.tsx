@@ -103,7 +103,7 @@ export function GraphPage() {
   };
 
   return (
-    <div className="space-y-5 h-full flex flex-col">
+    <div className="space-y-5 h-full flex flex-col pb-4">
       <div className="rounded-none border-2 border-black bg-gradient-to-r from-background via-muted/30 to-background px-4 py-4 shrink-0">
         <Badge className="rounded-none border border-black bg-black text-white font-mono text-[10px] uppercase">
           Graph

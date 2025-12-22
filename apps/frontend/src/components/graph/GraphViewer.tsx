@@ -19,9 +19,10 @@ export function GraphViewer({ onCyReady }: GraphViewerProps) {
   const highlightedEdges = useAppStore((s) => s.highlightedEdges);
   const highlightedNodes = useAppStore((s) => s.highlightedNodes);
   const edgeLabelMode = useAppStore((s) => s.edgeLabelMode);
+  const showLegend = useAppStore((s) => s.showLegend);
+  const toggleLegend = useAppStore((s) => s.toggleLegend);
 
   const [cyInstance, setCyInstance] = useState<cytoscape.Core | null>(null);
-  const [showLegend, setShowLegend] = useState(false);
 
   if (!loadedGraph) {
     return (
@@ -188,7 +189,7 @@ export function GraphViewer({ onCyReady }: GraphViewerProps) {
       {/* Compact Controls Overlay */}
       <CompactGraphControls
         cy={cyInstance}
-        onToggleLegend={() => setShowLegend(!showLegend)}
+        onToggleLegend={toggleLegend}
         onRearrange={() => {
           if (cyInstance) {
             const layoutInstance = cyInstance.layout(layout);
@@ -198,7 +199,7 @@ export function GraphViewer({ onCyReady }: GraphViewerProps) {
       />
 
       {/* Legend Popup */}
-      {showLegend && <LegendPopup onClose={() => setShowLegend(false)} />}
+      {showLegend && <LegendPopup onClose={toggleLegend} />}
     </div>
   );
 }

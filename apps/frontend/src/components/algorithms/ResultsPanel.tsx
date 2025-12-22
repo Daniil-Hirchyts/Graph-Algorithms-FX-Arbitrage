@@ -18,6 +18,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Download } from 'lucide-react';
+import { downloadJson } from '@/lib/utils';
 
 type AlgorithmResult =
   | BFSResponse
@@ -48,6 +50,33 @@ export function ResultsPanel({ result, onHighlight }: ResultsPanelProps) {
     );
   }
 
+  const isBellmanFord =
+    'negative_cycle_found' in result && 'distances' in result;
+  const bellmanResult = isBellmanFord
+    ? (result as BellmanFordResponse)
+    : null;
+  const bellmanDistanceEntries = bellmanResult
+    ? Object.entries(bellmanResult.distances).sort((a, b) =>
+        a[0].localeCompare(b[0])
+      )
+    : [];
+
+  const isFloyd = 'distance_matrix' in result && 'centrality' in result;
+  const floydResult = isFloyd
+    ? (result as FloydWarshallResponse)
+    : null;
+  const floydNodes = floydResult
+    ? floydResult.node_order.length > 0
+      ? floydResult.node_order
+      : Object.keys(floydResult.distance_matrix)
+    : [];
+  const floydPreviewNodes = floydNodes.slice(0, 8);
+  const floydCentralityEntries = floydResult
+    ? Object.entries(floydResult.centrality).sort((a, b) =>
+        a[0].localeCompare(b[0])
+      )
+    : [];
+
   return (
     <Card className="border-2 border-black rounded-none shadow-none">
       <CardHeader className="border-b-2 border-black pb-3 flex flex-row items-center justify-between space-y-0">
@@ -57,16 +86,32 @@ export function ResultsPanel({ result, onHighlight }: ResultsPanelProps) {
             Algorithm: {result.algorithm}
           </CardDescription>
         </div>
-        {onHighlight && (
-           <Button 
-             size="sm" 
-             variant="outline" 
-             className="border-2 border-black rounded-none font-mono uppercase text-xs h-7"
-             onClick={onHighlight}
-           >
-             Highlight Graph
-           </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {onHighlight && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-2 border-black rounded-none font-mono uppercase text-xs h-7"
+              onClick={onHighlight}
+            >
+              Highlight Graph
+            </Button>
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-2 border-black rounded-none font-mono uppercase text-xs h-7"
+            onClick={() =>
+              downloadJson(
+                `result-${result.algorithm}-${result.snapshot_id}.json`,
+                result
+              )
+            }
+          >
+            <Download className="mr-2 h-3 w-3" />
+            Download JSON
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6 pt-4">
         {/* Summary Section */}
@@ -259,6 +304,126 @@ export function ResultsPanel({ result, onHighlight }: ResultsPanelProps) {
                     )}
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {bellmanResult && bellmanDistanceEntries.length > 0 && (
+            <div>
+              <h4 className="mb-2 text-xs font-mono font-bold uppercase tracking-wider">Distances & Paths:</h4>
+              <div className="rounded-none border-2 border-black overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-b-2 border-black">
+                      <TableHead className="font-mono uppercase text-xs">Node</TableHead>
+                      <TableHead className="font-mono uppercase text-xs">Distance</TableHead>
+                      <TableHead className="font-mono uppercase text-xs">Path</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {bellmanDistanceEntries.map(([node, distance]) => {
+                      const path = bellmanResult.paths[node] || [];
+                      return (
+                        <TableRow key={node} className="border-b-2 border-black">
+                          <TableCell className="font-mono text-xs uppercase">{node}</TableCell>
+                          <TableCell className="font-mono text-xs">
+                            {distance === null || distance === undefined
+                              ? '∞'
+                              : distance.toFixed(4)}
+                          </TableCell>
+                          <TableCell className="font-mono text-xs">
+                            {path.length > 0 ? path.join(' → ') : '—'}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          )}
+
+          {floydResult && floydCentralityEntries.length > 0 && (
+            <div>
+              <h4 className="mb-2 text-xs font-mono font-bold uppercase tracking-wider">Centrality:</h4>
+              <div className="rounded-none border-2 border-black overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-b-2 border-black">
+                      <TableHead className="font-mono uppercase text-xs">Node</TableHead>
+                      <TableHead className="font-mono uppercase text-xs">Reachable</TableHead>
+                      <TableHead className="font-mono uppercase text-xs">Sum Distance</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {floydCentralityEntries.map(([node, info]) => (
+                      <TableRow key={node} className="border-b-2 border-black">
+                        <TableCell className="font-mono text-xs uppercase">
+                          {node}
+                          {floydResult.central_node === node && (
+                            <Badge
+                              variant="outline"
+                              className="ml-2 border-2 border-black rounded-none font-mono uppercase text-[10px]"
+                            >
+                              Central
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="font-mono text-xs">{info.reachable_count}</TableCell>
+                        <TableCell className="font-mono text-xs">
+                          {info.sum_distance === null || info.sum_distance === undefined
+                            ? '∞'
+                            : info.sum_distance.toFixed(4)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground font-mono">
+                {floydResult.centrality_note}
+              </p>
+            </div>
+          )}
+
+          {floydResult && floydPreviewNodes.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-xs font-mono font-bold uppercase tracking-wider">Distance Matrix (Preview):</h4>
+                {floydNodes.length > floydPreviewNodes.length && (
+                  <span className="text-[10px] font-mono text-muted-foreground">
+                    Showing {floydPreviewNodes.length} of {floydNodes.length}
+                  </span>
+                )}
+              </div>
+              <div className="rounded-none border-2 border-black overflow-auto">
+                <Table className="min-w-[600px]">
+                  <TableHeader>
+                    <TableRow className="border-b-2 border-black">
+                      <TableHead className="font-mono uppercase text-xs">From \\ To</TableHead>
+                      {floydPreviewNodes.map((node) => (
+                        <TableHead key={node} className="font-mono uppercase text-xs">
+                          {node}
+                        </TableHead>
+                      ))}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {floydPreviewNodes.map((row) => (
+                      <TableRow key={row} className="border-b-2 border-black">
+                        <TableCell className="font-mono text-xs uppercase">{row}</TableCell>
+                        {floydPreviewNodes.map((col) => {
+                          const value = floydResult.distance_matrix[row]?.[col];
+                          return (
+                            <TableCell key={`${row}-${col}`} className="font-mono text-xs">
+                              {value === null || value === undefined ? '∞' : value.toFixed(3)}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </div>
           )}

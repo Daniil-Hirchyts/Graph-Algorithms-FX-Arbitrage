@@ -14,9 +14,10 @@ In the FX view, each node is a currency, each directed edge is an exchange rate,
 
 ## Highlights
 
-- Graph dataset generation: random, scenarios, or custom inputs
+- Graph dataset generation: scenarios or custom inputs
 - Scenario presets with larger node sets for richer experiments
-- Randomized pair generation (no fixed connectivity presets)
+- Algorithm-specific presets (BFS/DFS/Dijkstra/Bellman-Ford/Floyd-Warshall/MST)
+- Scenario-defined pair structures for varied topology
 - In-browser snapshots via Dexie (no server-side persistence)
 - FastAPI REST API for graph algorithms
 - React/Vite UI for visualization and execution
@@ -118,22 +119,6 @@ Endpoints:
 
 ## Dataset Generation Examples
 
-### Random
-```bash
-curl -X POST http://localhost:8000/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "mode": "random",
-    "generation_params": {
-      "num_nodes": 10,
-      "value_min": 0.1,
-      "value_max": 10.0,
-      "variance": "medium",
-      "seed": 42
-    }
-  }'
-```
-
 ### Scenario
 ```bash
 curl -X POST http://localhost:8000/generate \
@@ -164,6 +149,8 @@ curl -X POST http://localhost:8000/generate \
 - The backend keeps a small in-memory cache only during the server session.
 - No snapshot files are written on the server.
 - If the backend restarts, `snapshot_id` references are no longer valid.
+- Use the snapshot history table to load or download JSON exports.
+- Algorithm results can be downloaded as JSON from the results panel.
 
 ## Testing
 

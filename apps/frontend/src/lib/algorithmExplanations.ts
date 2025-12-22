@@ -29,6 +29,10 @@ export interface AlgorithmExplanation {
     scenario: string;
     steps: string[];
     result: string;
+    graphData?: {
+      nodes: { id: string; label?: string }[];
+      edges: { source: string; target: string; label?: string; weight?: number }[];
+    };
   };
 
   // Key concepts
@@ -65,14 +69,34 @@ export const algorithmExplanations: Record<string, AlgorithmExplanation> = {
     },
 
     example: {
-      scenario: "Starting from USD, find all reachable currencies",
+      scenario: "Starting from USD, we want to find all reachable currencies layer by layer to understand the market structure.",
       steps: [
-        "Start: USD (distance 0)",
-        "Level 1: Visit EUR, GBP (distance 1 from USD)",
-        "Level 2: Visit JPY, CHF (distance 2 from USD)",
-        "Continue until all connected nodes are found"
+        "Start at USD (Level 0). Queue: [USD]",
+        "Process USD: Found neighbors EUR, GBP, CAD. Queue: [EUR, GBP, CAD]",
+        "Process EUR (Level 1): Found neighbor JPY. Queue: [GBP, CAD, JPY]",
+        "Process GBP (Level 1): Found neighbor CHF. Queue: [CAD, JPY, CHF]",
+        "Process CAD (Level 1): Found neighbor AUD. Queue: [JPY, CHF, AUD]",
+        "Process JPY (Level 2): Found neighbor NZD. Queue: [CHF, AUD, NZD]",
+        "Process remaining nodes (CHF, AUD, NZD) which have no new unvisited neighbors.",
+        "Result: We have mapped the market in layers of reachability."
       ],
-      result: "You get a tree showing the breadth-first exploration order"
+      result: "Layer 0: USD; Layer 1: EUR, GBP, CAD; Layer 2: JPY, CHF, AUD; Layer 3: NZD.",
+      graphData: {
+        nodes: [
+          { id: 'USD' }, { id: 'EUR' }, { id: 'GBP' }, { id: 'CAD' },
+          { id: 'JPY' }, { id: 'CHF' }, { id: 'AUD' }, { id: 'NZD' }
+        ],
+        edges: [
+          { source: 'USD', target: 'EUR' },
+          { source: 'USD', target: 'GBP' },
+          { source: 'USD', target: 'CAD' },
+          { source: 'EUR', target: 'JPY' },
+          { source: 'GBP', target: 'CHF' },
+          { source: 'CAD', target: 'AUD' },
+          { source: 'JPY', target: 'NZD' },
+          { source: 'CHF', target: 'JPY' } // Cross edge
+        ]
+      }
     },
 
     keyConcepts: [
@@ -112,15 +136,35 @@ export const algorithmExplanations: Record<string, AlgorithmExplanation> = {
     },
 
     example: {
-      scenario: "Starting from USD, explore deeply",
+      scenario: "Starting from USD, we want to simulate a trader following a single chain of conversions as far as possible before trying alternatives.",
       steps: [
-        "Start: USD",
-        "Go deep: USD → EUR → GBP → JPY",
-        "Backtrack: JPY has no unvisited neighbors",
-        "Try another path: USD → CHF → ...",
-        "Continue until all paths are explored"
+        "Start at USD. Choose neighbor EUR.",
+        "From EUR, choose JPY. Path: USD -> EUR -> JPY",
+        "From JPY, choose AUD. Path: USD -> EUR -> JPY -> AUD",
+        "From AUD, choose NZD. Path: USD -> EUR -> JPY -> AUD -> NZD",
+        "NZD is a dead end (no unvisited neighbors). Backtrack to AUD.",
+        "AUD has no other unvisited neighbors. Backtrack to JPY.",
+        "Backtrack to EUR. EUR has another neighbor CHF.",
+        "Go deep: EUR -> CHF. CHF has neighbor GBP.",
+        "Go deep: CHF -> GBP. GBP connects back to USD (visited).",
+        "Backtrack to complete exploration."
       ],
-      result: "You get a depth-first spanning tree showing the exploration order"
+      result: "Traversal Order: USD, EUR, JPY, AUD, NZD, CHF, GBP. Note the deep path first.",
+      graphData: {
+        nodes: [
+          { id: 'USD' }, { id: 'EUR' }, { id: 'JPY' }, { id: 'AUD' },
+          { id: 'NZD' }, { id: 'CHF' }, { id: 'GBP' }
+        ],
+        edges: [
+          { source: 'USD', target: 'EUR' },
+          { source: 'USD', target: 'GBP' }, // Alternative path not taken first
+          { source: 'EUR', target: 'JPY' },
+          { source: 'EUR', target: 'CHF' },
+          { source: 'JPY', target: 'AUD' },
+          { source: 'AUD', target: 'NZD' },
+          { source: 'CHF', target: 'GBP' }
+        ]
+      }
     },
 
     keyConcepts: [
@@ -161,15 +205,32 @@ export const algorithmExplanations: Record<string, AlgorithmExplanation> = {
     },
 
     example: {
-      scenario: "Find cheapest way to convert USD to JPY",
+      scenario: "Find the most cost-efficient route to convert USD to JPY, avoiding expensive direct fees.",
       steps: [
-        "Start: USD (cost 0)",
-        "Check: USD→EUR (cost 2), USD→GBP (cost 5)",
-        "Pick EUR (cheaper), now check EUR→JPY (cost 4)",
-        "Compare: USD→GBP→JPY vs USD→EUR→JPY",
-        "Choose the path with minimum total cost"
+        "Start at USD (Cost 0). Neighbors: EUR (2), GBP (5).",
+        "Pick cheapest: EUR (Cost 2). Update neighbors of EUR.",
+        "From EUR: check JPY (Cost 2+4=6) and CHF (Cost 2+1=3).",
+        "Current shortest known: USD->EUR->CHF (3), USD->GBP (5), USD->EUR->JPY (6).",
+        "Pick cheapest unvisited: CHF (Cost 3). Update neighbors of CHF.",
+        "From CHF: check JPY (Cost 3+1=4). This is better than previous 6!",
+        "Update JPY cost to 4 (Path: USD->EUR->CHF->JPY).",
+        "Next cheapest: GBP (Cost 5). Check neighbors (none improve JPY).",
+        "Finally visit JPY (Cost 4). Target reached."
       ],
-      result: "You get the optimal path: USD → EUR → JPY (total cost: 4)"
+      result: "Optimal Path: USD -> EUR -> CHF -> JPY. Total Cost: 4 (vs Direct/Other paths).",
+      graphData: {
+        nodes: [
+          { id: 'USD' }, { id: 'EUR' }, { id: 'GBP' }, { id: 'CHF' }, { id: 'JPY' }
+        ],
+        edges: [
+          { source: 'USD', target: 'EUR', weight: 2 },
+          { source: 'USD', target: 'GBP', weight: 5 },
+          { source: 'EUR', target: 'JPY', weight: 4 }, // Expensive direct link
+          { source: 'EUR', target: 'CHF', weight: 1 }, // Cheaper detour
+          { source: 'CHF', target: 'JPY', weight: 1 }, // Cheaper detour
+          { source: 'GBP', target: 'JPY', weight: 2 }
+        ]
+      }
     },
 
     keyConcepts: [
@@ -209,15 +270,29 @@ export const algorithmExplanations: Record<string, AlgorithmExplanation> = {
     },
 
     example: {
-      scenario: "Detect arbitrage starting from USD",
+      scenario: "Identify a hidden arbitrage loop where trading through multiple currencies results in a profit (negative total weight).",
       steps: [
-        "Convert USD → EUR → GBP → USD",
-        "Total cycle weight is negative (profitable loop)",
-        "After V-1 relaxations, distances keep improving",
-        "Algorithm detects the negative cycle",
-        "Returns the cycle currencies"
+        "Iteration 1: Relax edges. USD->EUR(1), EUR->GBP(1). Distances: EUR=1, GBP=Inf.",
+        "Iteration 2: Relax edges. GBP is now reachable via EUR. Distances: EUR=1, GBP=2.",
+        "Iteration 3: Check GBP->CAD(-5). CAD Distance = 2 - 5 = -3.",
+        "Iteration 4: Check CAD->USD(1). USD Distance = -3 + 1 = -2. Improved from 0!",
+        "Iteration 5 (Detection): We can still improve USD distance by going through the loop again.",
+        "Conclusion: Negative cycle detected USD -> EUR -> GBP -> CAD -> USD."
       ],
-      result: "Negative cycle found: USD → EUR → GBP → USD"
+      result: "Arbitrage Opportunity: The cycle USD-EUR-GBP-CAD-USD has a net weight of -2.",
+      graphData: {
+        nodes: [
+          { id: 'USD' }, { id: 'EUR' }, { id: 'GBP' }, { id: 'CAD' }, { id: 'JPY' }
+        ],
+        edges: [
+          { source: 'USD', target: 'EUR', weight: 1 },
+          { source: 'EUR', target: 'GBP', weight: 1 },
+          { source: 'GBP', target: 'CAD', weight: -5 }, // The 'profit' leg
+          { source: 'CAD', target: 'USD', weight: 1 },
+          { source: 'USD', target: 'JPY', weight: 2 }, // Distraction path
+          { source: 'JPY', target: 'CAD', weight: 2 }
+        ]
+      }
     },
 
     keyConcepts: [
@@ -258,15 +333,31 @@ export const algorithmExplanations: Record<string, AlgorithmExplanation> = {
     },
 
     example: {
-      scenario: "Build conversion table for USD, EUR, GBP, JPY",
+      scenario: "Build a comprehensive lookup table for the cheapest rates between ANY two currencies in a 5-node network.",
       steps: [
-        "Initialize matrix with direct edge weights",
-        "Consider USD as intermediate: update any i→USD→j paths",
-        "Consider EUR as intermediate: update paths through EUR",
-        "Continue for all nodes",
-        "Result: Complete matrix of best path costs"
+        "Init: Matrix with direct costs. Inf where no direct edge.",
+        "Phase 1 (via USD): Update paths like CAD->USD->EUR.",
+        "Phase 2 (via EUR): Update paths like USD->EUR->GBP. Might improve USD->GBP.",
+        "Phase 3 (via GBP): Update paths like EUR->GBP->JPY.",
+        "Phase 4 (via JPY): Update paths passing through JPY.",
+        "Phase 5 (via CAD): Final updates.",
+        "Result: A filled matrix where cell [i][j] is the absolute minimum cost."
       ],
-      result: "You get a 4×4 matrix showing optimal cost between any currency pair"
+      result: "We discovered that CAD->JPY is cheaper via USD->EUR than directly.",
+      graphData: {
+        nodes: [
+          { id: 'USD' }, { id: 'EUR' }, { id: 'GBP' }, { id: 'JPY' }, { id: 'CAD' }
+        ],
+        edges: [
+          { source: 'USD', target: 'EUR', weight: 1 },
+          { source: 'EUR', target: 'GBP', weight: 1 },
+          { source: 'GBP', target: 'JPY', weight: 1 },
+          { source: 'JPY', target: 'USD', weight: 10 }, // Expensive
+          { source: 'CAD', target: 'USD', weight: 1 },
+          { source: 'CAD', target: 'JPY', weight: 8 }, // Direct but expensive
+          { source: 'EUR', target: 'JPY', weight: 5 }
+        ]
+      }
     },
 
     keyConcepts: [
@@ -306,15 +397,35 @@ export const algorithmExplanations: Record<string, AlgorithmExplanation> = {
     },
 
     example: {
-      scenario: "Connect USD, EUR, GBP, JPY with minimum cost",
+      scenario: "Design a backbone network connecting 6 major currencies with the absolute minimum total link cost.",
       steps: [
-        "Start: Add USD to tree",
-        "Cheapest edge from USD: USD-EUR (cost 2)",
-        "Cheapest edge touching tree: EUR-GBP (cost 3)",
-        "Cheapest edge touching tree: GBP-JPY (cost 1)",
-        "All nodes connected, stop"
+        "Start with USD. Available edges: EUR(2), GBP(3), CAD(1).",
+        "Pick cheapest: USD-CAD (1). Tree is {USD, CAD}.",
+        "Available from tree: EUR(2), GBP(3), AUD(4 via CAD).",
+        "Pick cheapest: USD-EUR (2). Tree is {USD, CAD, EUR}.",
+        "Available from tree: GBP(3), AUD(4), JPY(2 via EUR).",
+        "Pick cheapest: EUR-JPY (2). Tree is {USD, CAD, EUR, JPY}.",
+        "Available: GBP(3), AUD(4), JPY-GBP(1).",
+        "Pick cheapest: JPY-GBP (1). Tree is {..., JPY, GBP}.",
+        "Finally pick GBP-AUD (3) over CAD-AUD (4). Tree Complete."
       ],
-      result: "MST edges: USD-EUR, EUR-GBP, GBP-JPY (total cost: 6)"
+      result: "MST edges: USD-CAD, USD-EUR, EUR-JPY, JPY-GBP, GBP-AUD. Total Cost: 9.",
+      graphData: {
+        nodes: [
+          { id: 'USD' }, { id: 'EUR' }, { id: 'GBP' },
+          { id: 'CAD' }, { id: 'JPY' }, { id: 'AUD' }
+        ],
+        edges: [
+          { source: 'USD', target: 'EUR', weight: 2 },
+          { source: 'USD', target: 'GBP', weight: 3 },
+          { source: 'USD', target: 'CAD', weight: 1 },
+          { source: 'CAD', target: 'AUD', weight: 4 },
+          { source: 'EUR', target: 'JPY', weight: 2 },
+          { source: 'GBP', target: 'JPY', weight: 1 },
+          { source: 'GBP', target: 'AUD', weight: 3 },
+          { source: 'EUR', target: 'GBP', weight: 5 } // Expensive redundant link
+        ]
+      }
     },
 
     keyConcepts: [
@@ -356,15 +467,33 @@ export const algorithmExplanations: Record<string, AlgorithmExplanation> = {
     },
 
     example: {
-      scenario: "Same problem as Prim, different approach",
+      scenario: "Connect 6 currencies with minimum cost using a global edge-sorting approach.",
       steps: [
-        "Sort edges: GBP-JPY(1), USD-EUR(2), EUR-GBP(3), USD-GBP(4), ...",
-        "Add GBP-JPY (connects GBP tree to JPY tree)",
-        "Add USD-EUR (connects USD tree to EUR tree)",
-        "Add EUR-GBP (connects USD-EUR tree to GBP-JPY tree)",
-        "All connected, stop"
+        "Sort edges: USD-CAD(1), JPY-GBP(1), USD-EUR(2), EUR-JPY(2), GBP-AUD(3), USD-GBP(3)...",
+        "Add USD-CAD (1). Sets: {USD,CAD}, {EUR}, {GBP}, ...",
+        "Add JPY-GBP (1). Sets: {USD,CAD}, {JPY,GBP}, {EUR}, ...",
+        "Add USD-EUR (2). Sets: {USD,CAD,EUR}, {JPY,GBP}, ...",
+        "Add EUR-JPY (2). Connects the two main sets! Merged: {USD,CAD,EUR,JPY,GBP}.",
+        "Next cheapest: GBP-AUD (3). Add it. All nodes connected.",
+        "Remaining edges (USD-GBP, etc.) are skipped as they form cycles."
       ],
-      result: "MST edges connect all currencies with minimal total cost"
+      result: "Same MST as Prim's: USD-CAD, JPY-GBP, USD-EUR, EUR-JPY, GBP-AUD.",
+      graphData: {
+        nodes: [
+          { id: 'USD' }, { id: 'EUR' }, { id: 'GBP' },
+          { id: 'CAD' }, { id: 'JPY' }, { id: 'AUD' }
+        ],
+        edges: [
+          { source: 'USD', target: 'EUR', weight: 2 },
+          { source: 'USD', target: 'GBP', weight: 3 },
+          { source: 'USD', target: 'CAD', weight: 1 },
+          { source: 'CAD', target: 'AUD', weight: 4 },
+          { source: 'EUR', target: 'JPY', weight: 2 },
+          { source: 'GBP', target: 'JPY', weight: 1 },
+          { source: 'GBP', target: 'AUD', weight: 3 },
+          { source: 'EUR', target: 'GBP', weight: 5 }
+        ]
+      }
     },
 
     keyConcepts: [

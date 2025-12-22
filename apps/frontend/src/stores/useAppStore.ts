@@ -65,6 +65,8 @@ interface AppState {
   // Graph UI
   edgeLabelMode: 'cost' | 'neglog' | 'none';
   setEdgeLabelMode: (m: 'cost' | 'neglog' | 'none') => void;
+  showLegend: boolean;
+  toggleLegend: () => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -91,7 +93,13 @@ export const useAppStore = create<AppState>()(
       loadedGraphSnapshotId: null,
       loadedGraph: null,
       setLoadedGraph: (snapshotId, graph) =>
-        set({ loadedGraphSnapshotId: snapshotId, loadedGraph: graph }),
+        set({
+          loadedGraphSnapshotId: snapshotId,
+          loadedGraph: graph,
+          algorithmResults: {},
+          highlightedNodes: [],
+          highlightedEdges: [],
+        }),
 
       // Algorithm results
       algorithmResults: {},
@@ -113,6 +121,8 @@ export const useAppStore = create<AppState>()(
       // Graph UI
       edgeLabelMode: 'cost',
       setEdgeLabelMode: (m) => set({ edgeLabelMode: m }),
+      showLegend: true,
+      toggleLegend: () => set((state) => ({ showLegend: !state.showLegend })),
     }),
     {
       name: 'graph-algorithms-storage',
@@ -126,6 +136,7 @@ export const useAppStore = create<AppState>()(
         highlightedNodes: state.highlightedNodes,
         highlightedEdges: state.highlightedEdges,
         edgeLabelMode: state.edgeLabelMode,
+        showLegend: state.showLegend,
       }),
     }
   )

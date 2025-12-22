@@ -17,10 +17,6 @@ cost_model:
   extra_cost: 5
 
 generated_data:
-  default_num_nodes: 7
-  default_value_min: 0.1
-  default_value_max: 10.0
-  default_variance: medium
   available_nodes:
     - USD
     - EUR

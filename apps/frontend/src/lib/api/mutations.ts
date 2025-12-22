@@ -13,7 +13,9 @@ export async function generateSnapshot(
   const data = await fetchJson<GenerationResponse>(`${apiBaseUrl}/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload || { mode: 'random' }),
+    body: JSON.stringify(
+      payload || { mode: 'scenario', scenario_id: 'dense_graph' }
+    ),
   });
 
   const parsed = GenerationResponseSchema.safeParse(data);

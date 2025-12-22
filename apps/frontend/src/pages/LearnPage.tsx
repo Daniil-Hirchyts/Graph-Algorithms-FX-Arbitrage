@@ -22,7 +22,7 @@ const algorithms: { key: AlgorithmKey; label: string; explanationId: string }[] 
 
 export function LearnPage() {
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 pb-4">
             <div className="rounded-none border-2 border-black bg-gradient-to-r from-background via-muted/30 to-background px-4 py-4 shrink-0">
                 <Badge className="rounded-none border border-black bg-black text-white font-mono text-[10px] uppercase">
                     Learn
@@ -53,7 +53,7 @@ export function LearnPage() {
                              return (
                                  <TabsContent key={algo.key} value={algo.key} className="m-0 focus-visible:ring-0">
                                      {explanation ? (
-                                         <div className="max-w-4xl">
+                                         <div className="">
                                              <AlgorithmInfo explanation={explanation} />
                                          </div>
                                      ) : (
