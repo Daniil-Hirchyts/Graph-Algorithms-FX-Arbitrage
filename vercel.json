@@ -1,5 +1,0 @@
-{
-  "installCommand": "npm install && npm install --no-save @rollup/rollup-linux-x64-gnu @swc/core-linux-x64-gnu",
-  "buildCommand": "turbo run build --filter=ui",
-  "framework": "vite"
-}
