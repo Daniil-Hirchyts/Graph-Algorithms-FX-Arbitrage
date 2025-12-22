@@ -1,0 +1,10 @@
+{
+  "name": "backend",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload",
+    "start": "python -m src.main",
+    "test": "pytest"
+  }
+}

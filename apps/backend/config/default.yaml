@@ -1,0 +1,51 @@
+nodes:
+  default_list:
+    - USD
+    - EUR
+    - GBP
+    - JPY
+    - CHF
+    - CAD
+    - AUD
+    - NZD
+    - SEK
+    - NOK
+  anchor_node: USD
+
+cost_model:
+  base_cost: 10
+  extra_cost: 5
+
+generated_data:
+  default_num_nodes: 7
+  default_value_min: 0.1
+  default_value_max: 10.0
+  default_variance: medium
+  available_nodes:
+    - USD
+    - EUR
+    - GBP
+    - JPY
+    - CHF
+    - CAD
+    - AUD
+    - NZD
+    - SEK
+    - NOK
+    - SGD
+    - HKD
+    - MXN
+    - BRL
+    - INR
+    - CNY
+    - KRW
+    - ZAR
+    - PLN
+    - CZK
+    - TRY
+    - AED
+    - SAR
+    - THB
+    - MYR
+    - IDR
+    - PHP
