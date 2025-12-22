@@ -18,6 +18,10 @@ interface AppState {
   currentPage: PageName;
   setPage: (p: PageName) => void;
 
+  // Sidebar UI
+  isSidebarCollapsed: boolean;
+  toggleSidebar: () => void;
+
   // API
   apiBaseUrl: string;
 
@@ -70,6 +74,11 @@ export const useAppStore = create<AppState>()(
       currentPage: 'data',
       setPage: (p) => set({ currentPage: p }),
 
+      // Sidebar UI
+      isSidebarCollapsed: false,
+      toggleSidebar: () =>
+        set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
+
       // API
       apiBaseUrl:
         import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
@@ -109,6 +118,7 @@ export const useAppStore = create<AppState>()(
       name: 'graph-algorithms-storage',
       partialize: (state) => ({
         currentPage: state.currentPage,
+        isSidebarCollapsed: state.isSidebarCollapsed,
         selectedSnapshotId: state.selectedSnapshotId,
         loadedGraphSnapshotId: state.loadedGraphSnapshotId,
         loadedGraph: state.loadedGraph,
