@@ -94,7 +94,7 @@ export function DataPage() {
     <div className="space-y-5">
       <div className="rounded-none border-2 border-black bg-gradient-to-r from-background via-muted/30 to-background px-4 py-4">
         <Badge className="rounded-none border border-black bg-black text-white font-mono text-[10px]">Data</Badge>
-        <h2 className="mt-2 text-2xl font-black tracking-tight">FX Data Management</h2>
+        <h2 className="mt-2 text-2xl font-black tracking-tight uppercase">FX Data Management</h2>
         <p className="text-sm text-muted-foreground">
           Create FX snapshots, load graphs, and explore scenarios.
         </p>

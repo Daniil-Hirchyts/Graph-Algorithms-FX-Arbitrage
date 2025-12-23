@@ -12,6 +12,14 @@ In the FX view, each node is a currency, each directed edge is an exchange rate,
 - Negative-log weights convert multiplicative rates into additive costs, letting shortest-path algorithms detect profitable cycles.
 - The backend stays domain-agnostic; swap currencies for any node labels and the algorithms still apply.
 
+## Screenshots
+
+<p align="center">
+  <img src="apps/frontend/public/Data.png" width="30%" alt="Data Generation" />
+  <img src="apps/frontend/public/Graph.png" width="30%" alt="Graph Visualization" />
+  <img src="apps/frontend/public/Learn.png" width="30%" alt="Algorithm Learning" />
+</p>
+
 ## Highlights
 
 - Graph dataset generation: scenarios or custom inputs
