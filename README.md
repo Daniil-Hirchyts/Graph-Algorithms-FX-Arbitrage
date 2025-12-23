@@ -83,6 +83,28 @@ cd apps/frontend
 npm run dev
 ```
 
+## Quickstart (Docker)
+
+```bash
+# Ensure backend .env exists
+cp apps/backend/.env.example apps/backend/.env
+
+# Build and run
+docker compose up --build
+```
+
+Access:
+- Frontend: http://localhost
+- Backend: http://localhost:8000
+- API Docs: http://localhost:8000/docs
+
+**Common commands:**
+```bash
+docker compose up -d          # Run in background
+docker compose logs -f        # View logs
+docker compose down           # Stop services
+```
+
 ## Environment Variables
 
 Backend (`apps/backend/.env`):

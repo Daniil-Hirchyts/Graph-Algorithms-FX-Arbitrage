@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+apps/*/node_modules/
+
+# Build output
+dist/
+build/
+.turbo/
+apps/**/dist/
+apps/**/build/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel/
+
+# Git
+.git/
+.gitignore
+.github/
+
+# Documentation
+*.md
+!README.md
+
+# Testing
+coverage/
+.pytest_cache/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
