@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { useAppStore } from "@/stores/useAppStore"
 import { cn } from "@/lib/utils"
-import { Database, Network, ChevronLeft, ChevronRight, GraduationCap } from "lucide-react"
+import { Database, Network, ChevronLeft, ChevronRight, GraduationCap, ExternalLink } from "lucide-react"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   collapsed?: boolean;
@@ -45,25 +45,46 @@ export function Sidebar({ className, collapsed = false, onToggleCollapse }: Side
         </div>
       </div>
 
-      {onToggleCollapse && (
-        <div className="border-t-2 border-black p-2">
+      <div>
+        <div className="px-2 pb-2">
           <Button
             variant="ghost"
-            size="sm"
-            className="w-full justify-center h-8 hover:bg-muted hover:text-foreground font-mono text-xs"
-            onClick={onToggleCollapse}
-          >
-            {collapsed ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <div className="flex items-center gap-2">
-                <ChevronLeft className="h-4 w-4" />
-                <span className="uppercase">Collapse</span>
-              </div>
+            asChild
+            size={collapsed ? "icon" : "default"}
+            title={collapsed ? "About author" : undefined}
+            className={cn(
+              "w-full font-mono text-xs uppercase tracking-wider transition-all",
+              collapsed ? "justify-center px-2 h-10" : "justify-start h-10 px-3",
+              "hover:bg-muted hover:text-foreground"
             )}
+          >
+            <a href="https://hirchyts-daniil.me/" target="_blank" rel="noopener noreferrer">
+              <ExternalLink className={cn("h-4 w-4", !collapsed && "mr-3")} />
+              {!collapsed && "About author"}
+            </a>
           </Button>
         </div>
-      )}
+
+        {onToggleCollapse && (
+          <div className="border-t-2 border-black p-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-center h-8 hover:bg-muted hover:text-foreground font-mono text-xs"
+              onClick={onToggleCollapse}
+            >
+              {collapsed ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <div className="flex items-center gap-2">
+                  <ChevronLeft className="h-4 w-4" />
+                  <span className="uppercase">Collapse</span>
+                </div>
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
